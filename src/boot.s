@@ -21,6 +21,7 @@ mboot:
     dd  MBOOT_HEADER_FLAGS      ; How GRUB should load your file / settings
     dd  MBOOT_CHECKSUM          ; To ensure that the above values are correct
     
+SECTION .text
 [GLOBAL start]                  ; Kernel entry point.
 [EXTERN main]                   ; This is the entry point of our C code
 
@@ -46,3 +47,10 @@ gdt_flush:
     jmp 0x08:.flush ; 0x08 is the offset to our kernel code segment: Far jump!
 .flush:
     ret
+
+[GLOBAL idt_flush]
+idt_flush:
+    mov eax, [esp+4]
+    lidt [eax]
+    ret
+

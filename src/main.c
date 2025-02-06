@@ -10,6 +10,6 @@ int main()
   init_descriptor_tables();
   tty_clear();
   tty_write("Hello Kernel Land\n");
-
   tty_write("GDT initialized\n");
+  tty_write_dec(sizeof(idt_entry_t));
 }
