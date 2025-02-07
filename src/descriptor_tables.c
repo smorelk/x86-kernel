@@ -59,6 +59,7 @@ static void init_idt()
   idt_ptr.size = (sizeof(idt_entry_t)*256)-1;
   idt_ptr.offset = (u32)&idt_entries;
 
+  // Trap gates
   idt_set_gate(0, (u32)&isr0, 0x08, 0x8E);
   idt_set_gate(1, (u32)&isr1, 0x08, 0x8E);
   idt_set_gate(2, (u32)&isr2, 0x08, 0x8E);
@@ -78,9 +79,24 @@ static void init_idt()
   idt_set_gate(16, (u32)&isr16, 0x08, 0x8E);
   idt_set_gate(17, (u32)&isr17, 0x08, 0x8E);
   idt_set_gate(18, (u32)&isr18, 0x08, 0x8E);
-  
-  for (int i = 19; i<256; i++)
-    idt_set_gate(i, 0, 0, 0); // Reserved
+
+
+      // Initialize master and slave PIC.
+  outb(0x20, 0x11);
+  outb(0xA0, 0x11);
+
+  // Remap master and slave
+  outb(0x21, 0x20);
+  outb(0xA1, 0x28);
+
+  // Tell master where the slave is (IRQ2) and
+  // tell slave where the master is.
+  outb(0x21, 0x04);
+  outb(0xA1, 0x02);
+
+  // Tell master and slave to use 8086 mode
+  outb(0x21, 0x01);
+  outb(0xA1, 0x01);
 
   idt_flush((u32)&idt_ptr);
 }
