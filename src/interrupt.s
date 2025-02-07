@@ -18,140 +18,56 @@ global isr15
 global isr16
 global isr17
 global isr18
-global isr33       ; Keyboard interrupt handler (IRQ1)
 
-; ISR 0 - isr0: Divide by Zero Exception
-isr0:
-    pusha
-    push dword 0x0      ; Push interrupt number 0 (Divide by Zero Exception)
-    popa
-    iret
+extern isr_handler
 
-; ISR 1 - isr1: Debug Exception
-isr1:
-    pusha
-    push dword 0x1      ; Push interrupt number 1 (Debug Exception)
-    popa
-    iret
+%macro ISR_NO_ERR 1
+isr%1:
+    cli             ; Disable interrupts
+    pushad           ; Save general-purpose registers
+    push dword 0    ; Push dummy error code
+    push dword %1   ; Push interrupt number
+    call isr_handler ; Call common handler
+    add esp, 8      ; Clean up pushed values
+    popad            ; Restore general-purpose registers
+    sti             ; Re-enable interrupts
+    iret            ; Return from interrupt
+%endmacro
 
-; ISR 2 - isr2: Non Maskable Interrupt (NMI)
-isr2:
-    pusha
-    push dword 0x2      ; Push interrupt number 2 (NMI)
-    popa
-    iret
+%macro ISR_ERR 1
+isr%1:
+    cli             ; Disable interrupts
+    pushad           ; Save general-purpose registers
+    push dword %1   ; Push interrupt number (error code is already on stack)
+    call isr_handler ; Call common handler
+    add esp, 4      ; Clean up interrupt number
+    popad            ; Restore registers
+    sti             ; Re-enable interrupts
+    iret            ; Return from interrupt
+%endmacro
 
-; ISR 3 - isr3: Breakpoint Exception (INT 3)
-isr3:
-    pusha
-    push dword 0x3      ; Push interrupt number 3 (Breakpoint Exception)
-    popa
-    iret
+; Exceptions 0-7 (No error codes)
+ISR_NO_ERR 0
+ISR_NO_ERR 1
+ISR_NO_ERR 2
+ISR_NO_ERR 3
+ISR_NO_ERR 4
+ISR_NO_ERR 5
+ISR_NO_ERR 6
+ISR_NO_ERR 7
 
-; ISR 4 - isr4: Overflow Exception (INTO)
-isr4:
-    pusha
-    push dword 0x4      ; Push interrupt number 4 (Overflow Exception)
-    popa
-    iret
+; Exceptions 8, 10-14 (Push real error codes)
+ISR_ERR 8
+ISR_NO_ERR 9
+ISR_ERR 10
+ISR_ERR 11
+ISR_ERR 12
+ISR_ERR 13
+ISR_ERR 14
 
-; ISR 5 - isr5: Out of Bounds Exception (BOUND Range Exceeded)
-isr5:
-    pusha
-    push dword 0x5      ; Push interrupt number 5 (Out of Bounds Exception)
-    popa
-    iret
-
-; ISR 6 - isr6: Invalid Opcode Exception
-isr6:
-    pusha
-    push dword 0x6      ; Push interrupt number 6 (Invalid Opcode Exception)
-    popa
-    iret
-
-; ISR 7 - isr7: Device Not Available Exception (No FPU)
-isr7:
-    pusha
-    push dword 0x7      ; Push interrupt number 7 (Device Not Available Exception)
-    popa
-    iret
-
-; ISR 8 - isr8: Double Fault Exception
-isr8:
-    pusha
-    popa
-    iret
-
-; ISR 9 - isr9: Coprocessor Segment Overrun (FPU error)
-isr9:
-    pusha
-    push dword 0x9      ; Push interrupt number 9 (Coprocessor Segment Overrun)
-    popa
-    iret
-
-; ISR 10 - isr10: Invalid TSS (Invalid Task State Segment)
-isr10:
-    pusha
-    popa
-    iret
-
-; ISR 11 - isr11: Segment Not Present Exception
-isr11:
-    pusha
-    popa
-    iret
-
-; ISR 12 - isr12: Stack Fault Exception
-isr12:
-    pusha
-    popa
-    iret
-
-; ISR 13 - isr13: General Protection Fault
-isr13:
-    pusha
-    popa
-    iret
-
-; ISR 14 - isr14: Page Fault Exception
-isr14:
-    pusha
-    ; The error code will be pushed by the CPU (it's automatic for Page Faults)
-    popa
-    iret
-
-; ISR 15 - isr15: Reserved (Unassigned Interrupt Vector)
-isr15:
-    pusha
-    push dword 0xF      ; Push interrupt number 15 (Reserved)
-    popa
-    iret
-
-; ISR 16 - isr16: x87 FPU Floating-Point Error
-isr16:
-    pusha
-    push dword 0x10     ; Push interrupt number 16 (FPU Floating-Point Error)
-    popa
-    iret
-
-; ISR 17 - isr17: Alignment Check Exception
-isr17:
-    pusha
-    push dword 0x11     ; Push interrupt number 17 (Alignment Check Exception)
-    popa
-    iret
-
-; ISR 18 - isr18: Machine Check Exception
-isr18:
-    pusha
-    push dword 0x12     ; Push interrupt number 18 (Machine Check Exception)
-    popa
-    iret
-
-; ISR 33 - Keyboard Interrupt (IRQ1)
-isr33:
-    pusha
-    push dword 0x21     ; Push interrupt number 33 (Keyboard Interrupt)
-    popa
-    iret
+; Exceptions 15-18 (No error codes)
+ISR_NO_ERR 15
+ISR_NO_ERR 16
+ISR_NO_ERR 17
+ISR_NO_ERR 18
 

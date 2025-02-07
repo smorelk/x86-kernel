@@ -4,6 +4,7 @@
 #include "descriptor_tables.h"
 
 extern void gdt_flush(u32);
+extern void idt_flush(u32);
 
 static gdt_entry_t gdt_entries[5];
 static gdt_ptr_t gdt_ptr;
@@ -79,7 +80,7 @@ static void init_idt()
   idt_set_gate(18, (u32)&isr18, 0x08, 0x8E);
   
   for (int i = 19; i<256; i++)
-    idt_set_gate(i, 0, 0, 0);
+    idt_set_gate(i, 0, 0, 0); // Reserved
 
   idt_flush((u32)&idt_ptr);
 }

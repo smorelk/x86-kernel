@@ -39,9 +39,11 @@ struct idt_ptr_struct
 typedef struct idt_entry_struct idt_entry_t;
 typedef struct idt_ptr_struct idt_ptr_t;
 
+void init_descriptor_tables(void);
 
-// Function from ASM
+// Functions from ASM
 extern void gdt_flush(u32);
+extern void idt_flush(u32);
 
 // Internal functions
 static void init_gdt();

@@ -70,6 +70,7 @@ void tty_write_hex(u32 n) {
     }
     n /= 16;
   }
+
   // NOTE: Digits are printed left-to-right
   for (int i = hex_len+1; i<8;i++) tty_put(hex[i]);
 }

@@ -7,9 +7,11 @@
 
 int main()
 {
-  init_descriptor_tables();
   tty_clear();
   tty_write("Hello Kernel Land\n");
+  init_descriptor_tables();
   tty_write("GDT initialized\n");
-  tty_write_dec(sizeof(idt_entry_t));
+  tty_write("IDT initialized\n");
+
+  asm volatile ("int $0x3");
 }
