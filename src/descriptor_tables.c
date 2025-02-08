@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "descriptor_tables.h"
+#include "irq.h"
 
 extern void gdt_flush(u32);
 extern void idt_flush(u32);
@@ -33,6 +34,23 @@ extern void isr15(void);
 extern void isr16(void);
 extern void isr17(void);
 extern void isr18(void);
+
+extern void irq0(void);
+extern void irq1(void);
+extern void irq2(void);
+extern void irq3(void);
+extern void irq4(void);
+extern void irq5(void);
+extern void irq6(void);
+extern void irq7(void);
+extern void irq8(void);
+extern void irq9(void);
+extern void irq10(void);
+extern void irq11(void);
+extern void irq12(void);
+extern void irq13(void);
+extern void irq14(void);
+extern void irq15(void);
 
 void init_descriptor_tables()
 {
@@ -80,8 +98,25 @@ static void init_idt()
   idt_set_gate(17, (u32)&isr17, 0x08, 0x8E);
   idt_set_gate(18, (u32)&isr18, 0x08, 0x8E);
 
+  // IRQs
+  idt_set_gate(IRQ(0), (u32)&irq0, 0x08, 0x8E); // IRQ 0
+  idt_set_gate(IRQ(1), (u32)&irq1, 0x08, 0x8E); // IRQ 1
+  idt_set_gate(IRQ(2), (u32)&irq2, 0x08, 0x8E); // IRQ 2
+  idt_set_gate(IRQ(3), (u32)&irq3, 0x08, 0x8E); // IRQ 3
+  idt_set_gate(IRQ(4), (u32)&irq4, 0x08, 0x8E); // IRQ 4
+  idt_set_gate(IRQ(5), (u32)&irq5, 0x08, 0x8E); // IRQ 5
+  idt_set_gate(IRQ(6), (u32)&irq6, 0x08, 0x8E); // IRQ 6
+  idt_set_gate(IRQ(7), (u32)&irq7, 0x08, 0x8E); // IRQ 7
+  idt_set_gate(IRQ(8), (u32)&irq8, 0x08, 0x8E); // IRQ 8
+  idt_set_gate(IRQ(9), (u32)&irq9, 0x08, 0x8E); // IRQ 9
+  idt_set_gate(IRQ(10), (u32)&irq10, 0x08, 0x8E); // IRQ 10
+  idt_set_gate(IRQ(11), (u32)&irq11, 0x08, 0x8E); // IRQ 11
+  idt_set_gate(IRQ(12), (u32)&irq12, 0x08, 0x8E); // IRQ 12
+  idt_set_gate(IRQ(13), (u32)&irq13, 0x08, 0x8E); // IRQ 13
+  idt_set_gate(IRQ(14), (u32)&irq14, 0x08, 0x8E); // IRQ 14
+  idt_set_gate(IRQ(15), (u32)&irq15, 0x08, 0x8E); // IRQ 14
 
-      // Initialize master and slave PIC.
+  // Initialize master and slave PIC.
   outb(0x20, 0x11);
   outb(0xA0, 0x11);
 

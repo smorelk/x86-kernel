@@ -1,27 +1,10 @@
+;   Interrupt.s - Interrupt handling code. Handles CPU-exceptions and also IRQs
 section .text
-global isr0
-global isr1
-global isr2
-global isr3
-global isr4
-global isr5
-global isr6
-global isr7
-global isr8
-global isr9
-global isr10
-global isr11
-global isr12
-global isr13
-global isr14
-global isr15
-global isr16
-global isr17
-global isr18
-
 extern isr_handler
+extern irq_handler
 
 %macro ISR_NO_ERR 1
+global isr%1
 isr%1:
     cli             ; Disable interrupts
     pushad           ; Save general-purpose registers
@@ -35,6 +18,7 @@ isr%1:
 %endmacro
 
 %macro ISR_ERR 1
+global isr%1
 isr%1:
     cli             ; Disable interrupts
     pushad           ; Save general-purpose registers
@@ -45,6 +29,40 @@ isr%1:
     sti             ; Re-enable interrupts
     iret            ; Return from interrupt
 %endmacro
+
+%macro IRQ 2
+    global irq%1
+    irq%1:
+        cli
+        pushad
+        push dword 0
+        push dword %2
+        call irq_handler
+        add esp, 8
+        popad
+        sti
+        iret
+%endmacro
+
+; IRQs
+IRQ 0,  0x20
+IRQ 1,  0x21
+IRQ 2,  0x22
+IRQ 3,  0x23
+IRQ 4,  0x24
+IRQ 5,  0x25
+IRQ 6,  0x26
+IRQ 7,  0x27
+IRQ 8,  0x28
+IRQ 9,  0x29
+IRQ 10, 0x2A
+IRQ 11, 0x2B
+IRQ 12, 0x2C
+IRQ 13, 0x2D
+IRQ 14, 0x2E
+IRQ 15, 0x2F
+
+; CPU Traps
 
 ; Exceptions 0-7 (No error codes)
 ISR_NO_ERR 0
