@@ -132,6 +132,9 @@ static void init_idt()
   // Tell master and slave to use 8086 mode
   outb(0x21, 0x01);
   outb(0xA1, 0x01);
+  
+  outb(0x21, 0x0);
+  outb(0xA1, 0x0);
 
   idt_flush((u32)&idt_ptr);
 }
