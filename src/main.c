@@ -5,6 +5,9 @@
 #include "tty.h"
 #include "descriptor_tables.h"
 
+extern void set_timer(u32);
+extern u32 __end;
+
 int main()
 {
   tty_clear();
@@ -12,6 +15,6 @@ int main()
   init_descriptor_tables();
   tty_write("GDT initialized\n");
   tty_write("IDT initialized\n");
-
-  asm volatile ("int $0x3");
+  set_timer(100);
+  tty_write("Timer initialized\n");
 }

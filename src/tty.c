@@ -9,6 +9,20 @@ static void move_cursor() {
   outb(0x3D5, cursor_loc);
 }
 
+static void scroll() {
+  u8 bg = 0;
+  u8 fg = 0xf;
+  u8 color = (bg<<4)|(fg&0xf);
+  u16 blank = (color<<8)|(s8)0x20; // Blank character
+  if (cursor_y >= 25) {
+    for (int i = 0; i < 80*24; i++)
+      vmem[i] = vmem[i+80];
+    for (int i = 24*80; i < 80*25; i++)
+      vmem[i] = blank;
+  }
+  cursor_y = 24;
+}
+
 void tty_put(s8 c) {
   // The background color is black, and the foreground is white.
   u8 bg = 0;
@@ -20,7 +34,6 @@ void tty_put(s8 c) {
   if (c == '\n') {
       cursor_x = 0;
       cursor_y++;
-      return;
   }
   u16 *location = vmem + (cursor_y * 80 + cursor_x);
   *location = ch;
@@ -30,8 +43,10 @@ void tty_put(s8 c) {
       cursor_x = 0;
       cursor_y++;
   }
+  scroll();
   move_cursor();
 }
+
 
 void tty_clear(void) {
   u8 bg = 0;

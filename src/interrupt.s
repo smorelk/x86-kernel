@@ -30,38 +30,18 @@ isr%1:
     iret            ; Return from interrupt
 %endmacro
 
-%macro IRQ 2
-    global irq%1
-    irq%1:
-        cli
-        pushad
-        push dword 0
-        push dword %2
-        call irq_handler
-        add esp, 8
-        popad
-        sti
-        iret
-%endmacro
 
 ; IRQs
-IRQ 0,  0x20
-IRQ 1,  0x21
-IRQ 2,  0x22
-IRQ 3,  0x23
-IRQ 4,  0x24
-IRQ 5,  0x25
-IRQ 6,  0x26
-IRQ 7,  0x27
-IRQ 8,  0x28
-IRQ 9,  0x29
-IRQ 10, 0x2A
-IRQ 11, 0x2B
-IRQ 12, 0x2C
-IRQ 13, 0x2D
-IRQ 14, 0x2E
-IRQ 15, 0x2F
 
+; IRQ0 (Timer)
+extern timer_interrupt
+global timer_int
+timer_int:
+    cli
+    ; Jump to C code
+    call timer_interrupt
+    sti
+    iret
 ; CPU Traps
 
 ; Exceptions 0-7 (No error codes)
@@ -77,8 +57,6 @@ ISR_NO_ERR 7
 ; Exceptions 8, 10-14 (Push real error codes)
 ISR_ERR 8
 ISR_NO_ERR 9
-ISR_ERR 10
-ISR_ERR 11
 ISR_ERR 12
 ISR_ERR 13
 ISR_ERR 14
